@@ -214,8 +214,24 @@ data Ldec = Ldec Var Ltype      -- Déclaration globale.
 s2t :: Sexp -> Ltype
 s2t (Ssym "Int") = Lint
 -- ¡¡COMPLÉTER ICI!!
-s2t (Scons (Scons (Scons Snil e1) (Ssym "->")) e2) = Larw (s2t e1) (s2t e2) 
+-- s2t (Scons (Scons (Scons Snil e1) (Ssym "->")) e2) = Larw (s2t e1) (s2t e2) 
+s2t (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "Int"))(Ssym "->")) = Larw Lint Lint
+s2t (Scons e (Ssym "Int") ) = Larw Lint (s2t e)
 
+{-
+ e2 = Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "Int")) 
+              (Ssym "->")
+-}
+{-
+Scons (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "Int")) 
+              (Ssym "->")) 
+       (Ssym "Int")
+-}
+
+{-                     Scons (Scons (Scons Snil (Ssym "Int")) 
+               (Ssym "->")) 
+      (Ssym "Int")
+-}
 
 s2t se = error ("Type Psil inconnu: " ++ (showSexp se))
 
@@ -302,6 +318,20 @@ synth tenv (Lhastype e t) =
       Nothing -> t
       Just err -> error err
 -- ¡¡COMPLÉTER ICI!!
+
+
+
+-- Appel de fonction, avec un argument. Lapp Lexp Lexp 
+-- "synthétiser" le type (t1 -> t2) en analysant e1.
+-- checker que e2 a le type t1, 
+-- reenvoier t2
+
+
+synth tenv (Lapp e1 e2) = 
+    case (synth tenv e1) of
+      Larw t1 t2 -> if( check tenv e2 t1 == Nothing) then t2 else error ""
+      otherwise -> error ""
+
 synth _tenv e = error ("Incapable de trouver le type de: " ++ (show e))
 
         
