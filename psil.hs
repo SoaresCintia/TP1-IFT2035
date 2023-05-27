@@ -214,17 +214,43 @@ data Ldec = Ldec Var Ltype      -- Déclaration globale.
 s2t :: Sexp -> Ltype
 s2t (Ssym "Int") = Lint
 -- ¡¡COMPLÉTER ICI!!
+s2t (Scons (Scons (Scons Snil e1) (Ssym "->")) e2) = Larw (s2t e1) (s2t e2) 
+
+
 s2t se = error ("Type Psil inconnu: " ++ (showSexp se))
 
+-- "elabore" une expression de type Sexp en Lexp
 s2l :: Sexp -> Lexp
 s2l (Snum n) = Lnum n
 s2l (Ssym s) = Lvar s
 -- ¡¡COMPLÉTER ICI!!
+
+s2l (Scons Snil (Ssym s)) = Lvar s
+s2l (Scons Snil (Snum n)) = Lnum n
+
+s2l (Scons Snil e) = s2l e
+s2l (Scons (Scons (Scons Snil (Ssym "fun")) (Ssym v)) e) = Lfun v (s2l e)
+s2l (Scons (Scons (Scons Snil (Ssym ":")) (Snum n)) (Ssym "Int")) = Lhastype (Lnum n) Lint
+s2l (Scons left right) = Lapp (s2l left) (s2l right)
+
+
+s2l (Scons (Scons (Scons Snil (Ssym "let")) 
+             (Scons Snil (Scons (Scons Snil (Ssym v)) e1))) e2 ) =  Llet v (s2l e1) (s2l e2) 
+
+
 s2l se = error ("Expression Psil inconnue: " ++ (showSexp se))
 
+-- 
 s2d :: Sexp -> Ldec
 s2d (Scons (Scons (Scons Snil (Ssym "def")) (Ssym v)) e) = Ldef v (s2l e)
 -- ¡¡COMPLÉTER ICI!!
+
+s2d (Scons (Scons (Scons Snil (Ssym "dec")) (Ssym v)) e) = Ldec v (s2t e)
+
+
+
+
+
 s2d se = error ("Déclaration Psil inconnue: " ++ showSexp se)
 
 ---------------------------------------------------------------------------
