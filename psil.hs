@@ -230,7 +230,8 @@ s2l (Scons Snil (Snum n)) = Lnum n
 
 s2l (Scons Snil e) = s2l e
 s2l (Scons (Scons (Scons Snil (Ssym "fun")) (Ssym v)) e) = Lfun v (s2l e)
-s2l (Scons (Scons (Scons Snil (Ssym ":")) (Snum n)) (Ssym "Int")) = Lhastype (Lnum n) Lint
+-- s2l (Scons (Scons (Scons Snil (Ssym ":")) (Snum n)) (Ssym "Int")) = Lhastype (Lnum n) Lint
+s2l (Scons (Scons (Scons Snil (Ssym ":")) e) t) = Lhastype (s2l e) (s2t t)
 s2l (Scons left right) = Lapp (s2l left) (s2l right)
 
 
