@@ -1,5 +1,15 @@
 -- TP-1  --- Implantation d'une sorte de Lisp          -*- coding: utf-8 -*-
 {-# OPTIONS_GHC -Wall #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use camelCase" #-}
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
+{-# HLINT ignore "Redundant bracket" #-}
+{-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
+{-# HLINT ignore "Use id" #-}
+{-# HLINT ignore "Use const" #-}
+{-# HLINT ignore "Use record patterns" #-}
+{-# HLINT ignore "Replace case with maybe" #-}
+{-# OPTIONS_GHC -Wno-overlapping-patterns #-}
 --
 -- Ce fichier défini les fonctionalités suivantes:
 -- - Analyseur lexical
@@ -248,7 +258,7 @@ s2l (Scons Snil e) = s2l e
 s2l (Scons (Scons (Scons Snil (Ssym "fun")) (Ssym v)) e) = Lfun v (s2l e)
 -- s2l (Scons (Scons (Scons Snil (Ssym ":")) (Snum n)) (Ssym "Int")) = Lhastype (Lnum n) Lint
 s2l (Scons (Scons (Scons Snil (Ssym ":")) e) t) = Lhastype (s2l e) (s2t t)
-s2l (Scons left right) = Lapp (s2l left) (s2l right)
+s2l (Scons ((Scons Snil (Ssym s))) right) = Lapp (Lvar s) (s2l right)
 
 
 s2l (Scons (Scons (Scons Snil (Ssym "let")) 
@@ -260,13 +270,10 @@ s2l se = error ("Expression Psil inconnue: " ++ (showSexp se))
 -- 
 s2d :: Sexp -> Ldec
 s2d (Scons (Scons (Scons Snil (Ssym "def")) (Ssym v)) e) = Ldef v (s2l e)
+         
 -- ¡¡COMPLÉTER ICI!!
 
 s2d (Scons (Scons (Scons Snil (Ssym "dec")) (Ssym v)) e) = Ldec v (s2t e)
-
-
-
-
 
 s2d se = error ("Déclaration Psil inconnue: " ++ showSexp se)
 
@@ -318,19 +325,16 @@ synth tenv (Lhastype e t) =
       Nothing -> t
       Just err -> error err
 -- ¡¡COMPLÉTER ICI!!
-
-
-
--- Appel de fonction, avec un argument. Lapp Lexp Lexp 
--- "synthétiser" le type (t1 -> t2) en analysant e1.
--- checker que e2 a le type t1, 
--- reenvoier t2
-
-
+-- Appel de fonction, avec un argument
+-- 1º "synthétiser" le type (t1 -> t2) en analysant e1
+-- 2º checker que e2 a le type t1
+-- 3º reenvoier t2
 synth tenv (Lapp e1 e2) = 
-    case (synth tenv e1) of
-      Larw t1 t2 -> if( check tenv e2 t1 == Nothing) then t2 else error ""
-      otherwise -> error ""
+    case synth tenv e1 of
+      Larw t1 t2 -> case check tenv e2 t1 of
+        Nothing -> t2
+        Just err -> error err
+      otherwise -> error ((show e1) ++ " n'est pas une fonction")
 
 synth _tenv e = error ("Incapable de trouver le type de: " ++ (show e))
 
@@ -367,7 +371,14 @@ eval :: VEnv -> Lexp -> Value
 eval _venv (Lnum n) = Vnum n
 eval venv (Lvar x) = mlookup venv x
 -- ¡¡COMPLÉTER ICI!!
+--Lapp Lexp Lexp
+{-
+Vop (\ (Vnum x) -> Vop (\ (Vnum y) -> Vnum (x + y)))
 
+eval venv (Lapp (Lvar f) (Lnum n)) = 
+  let
+    venv0' = (f,) : venv
+-}
 
 -- État de l'évaluateur.
 type EState = ((TEnv, VEnv),       -- Contextes de typage et d'évaluation.
@@ -419,11 +430,13 @@ run filename
 sexpOf :: String -> Sexp
 sexpOf = read
 
+-- lexOf : transforme la commende en en Lexpression
 lexpOf :: String -> Lexp
 lexpOf = s2l . sexpOf
 
 typeOf :: String -> Ltype
 typeOf = synth tenv0 . lexpOf
 
+-- evalue lexpression et transforme en Value
 valOf :: String -> Value
 valOf = eval venv0 . lexpOf
