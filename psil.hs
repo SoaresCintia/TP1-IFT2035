@@ -378,19 +378,14 @@ eval :: VEnv -> Lexp -> Value
 eval _venv (Lnum n) = Vnum n
 eval venv (Lvar x) = mlookup venv x
 -- ¡¡COMPLÉTER ICI!!
---Lapp Lexp Lexp
-{-
-Vop (\ (Vnum x) -> Vop (\ (Vnum y) -> Vnum (x + y)))
--}
+
 eval venv (Lapp (Lvar f) (Lnum n)) = 
   let
-    venv0' = (f,Vop (\ (Vnum y) -> Vnum (n + y))) : venv
+    fVop = mlookup venv f
   in 
-    mlookup venv0' f
-
--- Lapp (Lvar "+") (Lhastype (Lnum 2) Lint)
--- voir si c'eset eval qui doit checker le type
-
+    case fVop of
+      Vop g -> g (Vnum n) 
+    
 eval venv (Lapp (Lvar f) (Lhastype (Lnum n) _)) = eval venv (Lapp (Lvar f) (Lnum n))
 
 -- État de l'évaluateur.

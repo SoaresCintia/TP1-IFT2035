@@ -4,7 +4,7 @@
 (def r2 +)                                       ; ↝ <fonction> : Int -> Int -> Int
 (def r3 (+ 2))                                   ; ↝ <fonction> : Int -> Int
 
-;(def r4 (+ (: 2 Int)))                           ; ↝ <fonction> : Int -> Int
+(def r4 (+ (: 2 Int)))                           ; ↝ <fonction> : Int -> Int
 
 ;(def r5 ((+ 2) 4))                               ; ↝ 6 : Int
 
