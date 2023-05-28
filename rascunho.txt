@@ -1,0 +1,20 @@
+-- a efacer apres : teste
+--s2l (Scons (Scons Snil (Ssym "+")) (Snum 2)) = Lapp (Lvar "+") (Lnum 2)
+
+{-
+synth tenv (Lapp e1 e2) = 
+    case synth tenv e1 of
+       Larw t1 t2 -> if( check tenv e2 t1 == Nothing) then t2 else error "type "
+       otherwise -> error ""
+-}
+
+sexpOf "(def r3 (+ 2))" =
+      Scons (Scons (Scons Snil (Ssym "def")) (Ssym "r3")) (Scons (Scons Snil (Ssym "+")) (Snum 2))
+ s2d (Scons (Scons (Scons Snil (Ssym "def")) (Ssym v)) e) = Ldef v (s2l e)
+    e = (Scons (Scons Snil (Ssym "+")) (Snum 2))
+    s2l e = s2l (Scons (Scons Snil (Ssym "+")) (Snum 2))
+            s2l (Scons (Scons Snil (Ssym s)) right) = Lapp (Lvar s) (s2l right)
+
+
+lexpOf "(+ 2)"
+Lapp (Lvar "+") (Lnum 2)
