@@ -251,10 +251,10 @@ s2l (Snum n) = Lnum n
 s2l (Ssym s) = Lvar s
 -- ¡¡COMPLÉTER ICI!!
 
-{-
+
 s2l (Scons Snil (Ssym s)) = Lvar s
 s2l (Scons Snil (Snum n)) = Lnum n
--}
+
 --s2l (Scons ((Scons Snil (Ssym s))) right) = Lapp (Lvar s) (s2l right)
 s2l (Scons (Scons Snil (Ssym s)) right) = Lapp (Lvar s) (s2l right)
 
@@ -263,10 +263,11 @@ s2l (Scons (Scons Snil (Ssym s)) right) = Lapp (Lvar s) (s2l right)
 s2l (Scons Snil e) = s2l e
 
 s2l (Scons (Scons (Scons Snil (Ssym "fun")) (Ssym v)) e) = Lfun v (s2l e)
-
+-}
 -- s2l (Scons (Scons (Scons Snil (Ssym ":")) (Snum n)) (Ssym "Int")) = Lhastype (Lnum n) Lint
 s2l (Scons (Scons (Scons Snil (Ssym ":")) e) t) = Lhastype (s2l e) (s2t t)
 
+{-
 s2l (Scons (Scons (Scons Snil (Ssym "let")) 
              (Scons Snil (Scons (Scons Snil (Ssym v)) e1))) e2 ) =  Llet v (s2l e1) (s2l e2) 
 
@@ -387,6 +388,10 @@ eval venv (Lapp (Lvar f) (Lnum n)) =
   in 
     mlookup venv0' f
 
+-- Lapp (Lvar "+") (Lhastype (Lnum 2) Lint)
+-- voir si c'eset eval qui doit checker le type
+
+eval venv (Lapp (Lvar f) (Lhastype (Lnum n) _)) = eval venv (Lapp (Lvar f) (Lnum n))
 
 -- État de l'évaluateur.
 type EState = ((TEnv, VEnv),       -- Contextes de typage et d'évaluation.
@@ -408,6 +413,7 @@ process_decl ((tenv, venv), Nothing, res) (Ldef x e) =
         venv' = minsert venv x val
     in ((tenv', venv'), Nothing, (val, ltype) : res)
 -- ¡¡COMPLÉTER ICI!!
+
 
 ---------------------------------------------------------------------------
 -- Toplevel                                                              --

@@ -1,3 +1,41 @@
+Exemple 4:
+
+(def r4 (+ (: 2 Int)))
+     Scons (Scons (Scons Snil (Ssym "def")) (Ssym "r4")) (Scons (Scons Snil (Ssym "+")) (Scons (Scons (Scons Snil (Ssym ":")) (Snum 2)) (Ssym "Int")))
+s2d (Scons (Scons (Scons Snil (Ssym "def")) (Ssym v)) e) = Ldef v (s2l e)
+
+    (Scons (Scons Snil (Ssym "+")) (Scons (Scons (Scons Snil (Ssym ":")) (Snum 2)) (Ssym "Int")))
+s2l (Scons (Scons Snil (Ssym   s)) right) = Lapp (Lvar s) (s2l right)
+
+    s2l (Scons (Scons (Scons Snil (Ssym ":")) e) t) = Lhastype (s2l e) (s2t t)
+
+right = (Scons (Scons (Scons Snil (Ssym ":")) (Snum 2)) (Ssym "Int"))
+
+e = (Snum 2)
+s2l e = Lnum 2
+
+t = (Ssym "Int")
+s2t t = Lint
+
+Lhastype (Lnum 2) (Lint)
+
+Lapp (Lvar "+") (Lhastype (Lnum 2) (Lint))
+
+ghci> lexpOf "(+ (: 2 Int))"
+Lapp (Lvar "+") (Lhastype (Lnum 2) Lint)
+
+
+
+
+
+
+
+
+
+
+
+
+
 -- a efacer apres : teste
 --s2l (Scons (Scons Snil (Ssym "+")) (Snum 2)) = Lapp (Lvar "+") (Lnum 2)
 
