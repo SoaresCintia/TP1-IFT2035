@@ -1,11 +1,35 @@
+Lfun "y" (Lapp (Lapp (Lvar "+") (Lvar "y")) 
+               (Lnum 5))
+
+
+____________________________________________________
+
 ghci> sexpOf "(Int Int -> Int)"
 Scons (Scons (Scons (Scons Snil (Ssym "Int")) 
                     (Ssym "Int")) 
              (Ssym "->")) 
       (Ssym "Int")
 
+s2t (Ssym "Int") = Lint
+s2t (Scons Snil e) = s2t e 
+s2t (Scons e (Ssym "->")) = s2t e
+s2t (Scons e1 e2) = Larw (s2t e1) (s2t e2) 
 
+Scons (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "Int")) (Ssym "->")) (Ssym "Int")
+= Larw (s2t e1) (s2t e2) 
 
+s2t e1 = s2t (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "Int")) (Ssym "->"))
+       = s2t (Scons (Scons Snil (Ssym "Int")) (Ssym "Int"))
+       = Larw (s2t (Scons Snil (Ssym "Int"))) (s2t (Ssym "Int")) 
+       = Larw (s2t (Ssym "Int")) (s2t (Ssym "Int"))
+       = Larw Lint Lint
+
+s2t e2 = s2t (Ssym "Int") = Lint
+
+Larw (s2t e1) (s2t e2) = 
+Larw (Larw Lint Lint) (Lint)
+
+----------------------------------------------------------------------------------------
 (def f1 (fun x (fun y (+ y 5))))                 ; ↝ <fonction> : Int -> Int -> Int
 f1 = \x -> \y -> y+5
 

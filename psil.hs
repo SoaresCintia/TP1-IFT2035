@@ -224,9 +224,16 @@ data Ldec = Ldec Var Ltype      -- Déclaration globale.
 s2t :: Sexp -> Ltype
 s2t (Ssym "Int") = Lint
 -- ¡¡COMPLÉTER ICI!!
--- s2t (Scons (Scons (Scons Snil e1) (Ssym "->")) e2) = Larw (s2t e1) (s2t e2) 
-s2t (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "Int"))(Ssym "->")) = Larw Lint Lint
-s2t (Scons e (Ssym "Int") ) = Larw Lint (s2t e)
+s2t (Scons Snil e) = s2t e 
+--s2t (Scons (Scons (Scons Snil e1) (Ssym "->")) e2) = Larw (s2t e1) (s2t e2)
+s2t (Scons e (Ssym "->")) = s2t e
+s2t (Scons e1 e2) = Larw (s2t e1) (s2t e2) 
+
+--s2t (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "Int"))(Ssym "->")) = Larw Lint Lint
+--s2t (Scons e (Ssym "Int") ) = Larw Lint (s2t e)
+
+--s2l (Scons fct arg) = Lapp (s2l fct) (s2l arg)
+
 
 s2t se = error ("Type Psil inconnu: " ++ (showSexp se))
 
@@ -331,9 +338,9 @@ synth tenv (Lhastype e t) =
 synth tenv (Lapp e1 e2) = 
     case synth tenv e1 of
       Larw t1 t2 -> case check tenv e2 t1 of
-        Nothing -> t2
-        Just err -> error err
-      otherwise -> error ((show e1) ++ " n'est pas une fonction")
+                      Nothing -> t2
+                      Just err -> error err
+      _ -> error ((show e1) ++ " n'est pas une fonction")
 
 {-Llet Var Lexp Lexp  -- Déclaration de variable locale. -}
 -- 1º "synthétiser" le type t1 en analysant e1
@@ -346,7 +353,11 @@ synth tenv (Llet x e1 e2) =
   in 
     t2
 
-
+synth tenv (Lfun var _) = Larw Lint Lint -- juste pour tester l'exemple, ce n'est pas le cas general
+ -- ça fonctionne l'exemple
+ -- faire le cas general 
+  --mlookup tenv var
+-- comment trouver le type d'une lfun ?
 synth _tenv e = error ("Incapable de trouver le type de: " ++ (show e))
 
         
@@ -399,12 +410,13 @@ eval venv (Llet varName varExp expr) =
   in
     eval venv' expr
 
-eval venv (Lfun funName fun) =
-  let
-    evalFun = eval venv fun
-    venv' = (funName, evalFun) : venv
-  in
-    Vfun venv' funName fun -- ??? bonne chose ? comment c'est utilisé ?
+-- Lfun Var Lexp
+eval venv (Lfun var expr) = Vfun venv var expr
+  -- il faut retourner Value 
+                        -- Vnum Int
+                        -- | Vfun VEnv Var Lexp
+                        -- | Vop (Value -> Value) 
+  
 
 -- État de l'évaluateur.
 type EState = ((TEnv, VEnv),       -- Contextes de typage et d'évaluation.

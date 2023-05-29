@@ -1,0 +1,6 @@
+;; (def test1 (let ((x 0)) (let ((x 1)) (* x 9))))                 ; ↝ 9 : Int
+;; (def test2 (let ((x 1)) (let ((x 1)) (let ((x 0)) (* x 9)))))   ; ↝ 0 : Int
+
+;; (def funInc (fun x (x+1)) (let ((funInc)) (funInc 1)))
+(def funInc (fun x (x+1)))
+(let ((funInc)) (funInc 1))
