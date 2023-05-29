@@ -1,3 +1,12 @@
+sexpOf "(def r5 ((+ 2) 4))"
+Scons (Scons (Scons Snil (Ssym "def")) (Ssym "r5")) 
+      (
+        Scons (Scons Snil (Scons (Scons Snil (Ssym "+")) (Snum 2))) (Snum 4)
+      )
+
+
+
+
 (f a b c) va retourner :
 
 Lapp (Lapp (Lapp (Lvar "f") (Lvar "a")) (Lvar "b")) (Lvar "c")
