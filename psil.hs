@@ -314,10 +314,6 @@ check tenv e t
     in if t == t' then Nothing
        else Just ("Erreur de type: " ++ show t ++ " ≠ " ++ show t')
 
-
-
-
-
 -- `synth Γ e` vérifie que `e` est typé correctement et ensuite "synthétise"
 -- et renvoie son type `τ`.
 synth :: TEnv -> Lexp -> Ltype
@@ -339,11 +335,16 @@ synth tenv (Lapp e1 e2) =
         Just err -> error err
       otherwise -> error ((show e1) ++ " n'est pas une fonction")
 
-
-
 {-Llet Var Lexp Lexp  -- Déclaration de variable locale. -}
-
-
+-- 1º "synthétiser" le type t1 en analysant e1
+-- 2º "synthétiser" le type t2 en analysant e2 dans l'env auquel on a ajouté (x,t1)
+-- 3º reenvoier t2
+synth tenv (Llet x e1 e2) =
+  let
+    t1 = synth tenv e1 
+    t2 = synth ((x,t1):tenv) e2 
+  in 
+    t2
 
 
 synth _tenv e = error ("Incapable de trouver le type de: " ++ (show e))
