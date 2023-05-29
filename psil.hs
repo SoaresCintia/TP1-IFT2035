@@ -294,12 +294,29 @@ tenv0 = [("+", Larw Lint (Larw Lint Lint)),
 -- `check Γ e τ` vérifie que `e` a type `τ` dans le contexte `Γ`.
 check :: TEnv -> Lexp -> Ltype -> Maybe TypeError
 -- ¡¡COMPLÉTER ICI!!
+
+---------------
+{-Lfun Var Lexp -}
+-- Déclaration fonction anonyme
+-- Pour vérifier que la fonction a bien le type (t1 -> t2)
+-- 1º checker que expr a le type t2 dans l'env auquel on ajoute (x,t1)
+-- 3º reenvoier Maybe TypeError
+check tenv (Lfun x expr) (Larw t1 t2) = check ((x,t1):tenv) expr t2
+
+
+---------------
+
+
 check tenv e t
   -- Essaie d'inférer le type et vérifie alors s'il correspond au
   -- type attendu.
   = let t' = synth tenv e
     in if t == t' then Nothing
        else Just ("Erreur de type: " ++ show t ++ " ≠ " ++ show t')
+
+
+
+
 
 -- `synth Γ e` vérifie que `e` est typé correctement et ensuite "synthétise"
 -- et renvoie son type `τ`.
@@ -321,6 +338,13 @@ synth tenv (Lapp e1 e2) =
         Nothing -> t2
         Just err -> error err
       otherwise -> error ((show e1) ++ " n'est pas une fonction")
+
+
+
+{-Llet Var Lexp Lexp  -- Déclaration de variable locale. -}
+
+
+
 
 synth _tenv e = error ("Incapable de trouver le type de: " ++ (show e))
 
@@ -401,8 +425,16 @@ process_decl ((tenv, venv), Nothing, res) (Ldef x e) =
         venv' = minsert venv x val
     in ((tenv', venv'), Nothing, (val, ltype) : res)
 -- ¡¡COMPLÉTER ICI!!
-
-
+{-
+process_decl ((tenv, venv), Just (v,t) , res) (Ldef x e) =
+    -- Le programmeur a *fourni* d'annotation de type pour `x`.
+    let ltype = synth tenv e
+        if 
+        tenv' = minsert tenv x ltype
+        val = eval venv e
+        venv' = minsert venv x val
+    in ((tenv', venv'), Nothing, (val, ltype) : res)
+-}
 ---------------------------------------------------------------------------
 -- Toplevel                                                              --
 ---------------------------------------------------------------------------

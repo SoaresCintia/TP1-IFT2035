@@ -1,10 +1,20 @@
-sexpOf "(def r5 ((+ 2) 4))"
-Scons (Scons (Scons Snil (Ssym "def")) (Ssym "r5")) 
-      (
-        Scons (Scons Snil (Scons (Scons Snil (Ssym "+")) (Snum 2))) (Snum 4)
-      )
+ghci> sexpOf "(+ 2 5)"
+      Scons (Scons (Scons Snil (Ssym "+")) 
+                   (Snum 2)) 
+            (Snum 5)
+ghci> sexpOf "((+ 2) 4)"
+      Scons (Scons Snil 
+                   (Scons (Scons Snil (Ssym "+")) (Snum 2))) 
+            (Snum 4)
 
 
+ghci> lexpOf " ((+ 2) 4)"
+     Lapp (Lapp (Lvar "+") (Lnum 2))
+          (Lnum 4)
+
+ghci> lexpOf "(+ 2 5)"
+    Lapp (Lapp (Lvar "+") (Lnum 2)) 
+         (Lnum 5)
 
 
 (f a b c) va retourner :
