@@ -414,10 +414,12 @@ type EState = ((TEnv, VEnv),       -- Contextes de typage et d'évaluation.
 -- Évalue une déclaration, y compris vérification des types.
 process_decl :: EState -> Ldec -> EState
 process_decl (env, Nothing, res) (Ldec x t) = (env, Just (x,t), res)
+
 process_decl (env, Just (x', _), res) (decl@(Ldec _ _)) =
     process_decl (env, Nothing,
                   error ("Manque une définition pour: " ++ x') : res)
                  decl
+
 process_decl ((tenv, venv), Nothing, res) (Ldef x e) =
     -- Le programmeur n'a *pas* fourni d'annotation de type pour `x`.
     let ltype = synth tenv e
@@ -426,16 +428,19 @@ process_decl ((tenv, venv), Nothing, res) (Ldef x e) =
         venv' = minsert venv x val
     in ((tenv', venv'), Nothing, (val, ltype) : res)
 -- ¡¡COMPLÉTER ICI!!
-{-
+
 process_decl ((tenv, venv), Just (v,t) , res) (Ldef x e) =
-    -- Le programmeur a *fourni* d'annotation de type pour `x`.
+    -- Le programmeur a *fourni* d'annotation ou a declaré de type pour `x`.
     let ltype = synth tenv e
-        if 
         tenv' = minsert tenv x ltype
         val = eval venv e
         venv' = minsert venv x val
-    in ((tenv', venv'), Nothing, (val, ltype) : res)
--}
+    in 
+      if t == ltype then
+        ((tenv', venv'), Nothing, (val, ltype) : res)
+      else
+        error ("variable déja declaré avec un autre type")
+
 ---------------------------------------------------------------------------
 -- Toplevel                                                              --
 ---------------------------------------------------------------------------
