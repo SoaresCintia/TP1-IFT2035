@@ -6,10 +6,10 @@
 
 (def r4 (+ (: 2 Int)))                           ; ↝ <fonction> : Int -> Int
 
-;(def r5 ((+ 2) 4))                               ; ↝ 6 : Int
+(def r5 ((+ 2) 4))                               ; ↝ 6 : Int
 
-;(dec r6 Int)
-;(def r6 (+ 2 5))                                 ; ↝ 7 : Int
+(dec r6 Int)
+(def r6 (+ 2 5))                                 ; ↝ 7 : Int
 
 ;(def r7 (let ((x 5)) (* x 4)))                   ; ↝ 20 : Int
 

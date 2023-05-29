@@ -228,21 +228,6 @@ s2t (Ssym "Int") = Lint
 s2t (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "Int"))(Ssym "->")) = Larw Lint Lint
 s2t (Scons e (Ssym "Int") ) = Larw Lint (s2t e)
 
-{-
- e2 = Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "Int")) 
-              (Ssym "->")
--}
-{-
-Scons (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "Int")) 
-              (Ssym "->")) 
-       (Ssym "Int")
--}
-
-{-                     Scons (Scons (Scons Snil (Ssym "Int")) 
-               (Ssym "->")) 
-      (Ssym "Int")
--}
-
 s2t se = error ("Type Psil inconnu: " ++ (showSexp se))
 
 -- "elabore" une expression de type Sexp en Lexp
@@ -251,28 +236,22 @@ s2l (Snum n) = Lnum n
 s2l (Ssym s) = Lvar s
 -- ¡¡COMPLÉTER ICI!!
 
-
-s2l (Scons Snil (Ssym s)) = Lvar s
-s2l (Scons Snil (Snum n)) = Lnum n
-
---s2l (Scons ((Scons Snil (Ssym s))) right) = Lapp (Lvar s) (s2l right)
-s2l (Scons (Scons Snil (Ssym s)) right) = Lapp (Lvar s) (s2l right)
-
-
-{-
+-- Lexp pour appels en psil du genre: "(e)"
 s2l (Scons Snil e) = s2l e
 
-s2l (Scons (Scons (Scons Snil (Ssym "fun")) (Ssym v)) e) = Lfun v (s2l e)
--}
--- s2l (Scons (Scons (Scons Snil (Ssym ":")) (Snum n)) (Ssym "Int")) = Lhastype (Lnum n) Lint
+-- Lexp pour déclarations de type en psil: "(: e τ)"
 s2l (Scons (Scons (Scons Snil (Ssym ":")) e) t) = Lhastype (s2l e) (s2t t)
 
-{-
-s2l (Scons (Scons (Scons Snil (Ssym "let")) 
-             (Scons Snil (Scons (Scons Snil (Ssym v)) e1))) e2 ) =  Llet v (s2l e1) (s2l e2) 
+-- Lexp pour fonctions en psil: "(fun x e)"
+s2l (Scons (Scons (Scons Snil (Ssym "fun")) (Ssym x)) e) = Lfun x (s2l e)
 
--}
-s2l se = error ("Expression Psil inconnue: " ++ (showSexp se))
+-- Lexp pour let en psil: "(let ((x e1)) e2)"
+s2l (Scons (Scons (Scons Snil (Ssym "let"))
+  (Scons Snil (Scons (Scons Snil (Ssym x)) e1))) e2)
+    = Llet x (s2l e1) (s2l e2)
+
+-- Lexp pour appels de fonctions en psil: "(fct arg)"
+s2l (Scons fct arg) = Lapp (s2l fct) (s2l arg)
 
 -- 
 s2d :: Sexp -> Ldec
@@ -380,7 +359,6 @@ eval venv (Lvar x) = mlookup venv x
 -- ¡¡COMPLÉTER ICI!!
 eval venv (Lhastype expr _) =  eval venv expr
 
-
 eval venv (Lapp fun arg) = -- fonction indsirée de la démo #4.1
   let
     valFun = eval venv fun
@@ -390,13 +368,11 @@ eval venv (Lapp fun arg) = -- fonction indsirée de la démo #4.1
       Vnum _ -> error "n'est pas une fonction"
       Vop f -> f valArg
 
-
-eval venv (Llet varName varExp exp) =
+eval venv (Llet varName varExp expr) =
   let
     venv' = (varName, eval venv varExp) : venv -- appel par valeur?
   in
-    eval venv' exp
-
+    eval venv' expr
 
 eval venv (Lfun funName fun) =
   let
