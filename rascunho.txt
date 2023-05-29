@@ -1,3 +1,20 @@
+ghci> sexpOf "(Int Int -> Int)"
+Scons (Scons (Scons (Scons Snil (Ssym "Int")) 
+                    (Ssym "Int")) 
+             (Ssym "->")) 
+      (Ssym "Int")
+
+
+
+(def f1 (fun x (fun y (+ y 5))))                 ; ↝ <fonction> : Int -> Int -> Int
+f1 = \x -> \y -> y+5
+
+*** Exception: Incapable de trouver le type de: 
+Lfun "x" (Lfun "y" (Lapp (Lapp (Lvar "+") (Lvar "y")) (Lnum 5)))
+
+
+
+
 ghci> sexpOf "(+ 2 5)"
       Scons (Scons (Scons Snil (Ssym "+")) 
                    (Snum 2)) 
