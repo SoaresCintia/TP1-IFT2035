@@ -378,15 +378,32 @@ eval :: VEnv -> Lexp -> Value
 eval _venv (Lnum n) = Vnum n
 eval venv (Lvar x) = mlookup venv x
 -- ¡¡COMPLÉTER ICI!!
+eval venv (Lhastype expr _) =  eval venv expr
 
-eval venv (Lapp (Lvar f) (Lnum n)) = 
+
+eval venv (Lapp fun arg) = -- fonction indsirée de la démo #4.1
   let
-    fVop = mlookup venv f
-  in 
-    case fVop of
-      Vop g -> g (Vnum n) 
-    
-eval venv (Lapp (Lvar f) (Lhastype (Lnum n) _)) = eval venv (Lapp (Lvar f) (Lnum n))
+    valFun = eval venv fun
+    valArg = eval venv arg
+  in
+    case valFun of
+      Vnum _ -> error "n'est pas une fonction"
+      Vop f -> f valArg
+
+
+eval venv (Llet varName varExp exp) =
+  let
+    venv' = (varName, eval venv varExp) : venv -- appel par valeur?
+  in
+    eval venv' exp
+
+
+eval venv (Lfun funName fun) =
+  let
+    evalFun = eval venv fun
+    venv' = (funName, evalFun) : venv
+  in
+    Vfun venv' funName fun -- ??? bonne chose ? comment c'est utilisé ?
 
 -- État de l'évaluateur.
 type EState = ((TEnv, VEnv),       -- Contextes de typage et d'évaluation.

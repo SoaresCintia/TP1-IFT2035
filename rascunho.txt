@@ -1,3 +1,9 @@
+(f a b c) va retourner :
+
+Lapp (Lapp (Lapp (Lvar "f") (Lvar "a")) (Lvar "b")) (Lvar "c")
+
+
+
 Exemple 4:
 
 (def r4 (+ (: 2 Int)))
