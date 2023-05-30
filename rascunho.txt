@@ -1,3 +1,16 @@
+ghci> sexpOf "(Int -> Int)"
+Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "->")) (Ssym "Int")
+Scons (Scons (e)(Ssym "->")) (Ssym "Int")
+
+ghci> sexpOf "(Int Int -> Int)"
+Scons (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "Int")) (Ssym "->")) (Ssym "Int")
+Scons (Scons (e)(Ssym "->")) (Ssym "Int")
+
+ghci> sexpOf "(Int Int Int -> Int)"
+Scons (Scons (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "Int")) (Ssym "Int")) (Ssym "->")) (Ssym "Int")
+Scons (Scons (e)(Ssym "->")) (Ssym "Int")
+
+___________________________________________________
 Lfun "y" (Lapp (Lapp (Lvar "+") (Lvar "y")) 
                (Lnum 5))
 

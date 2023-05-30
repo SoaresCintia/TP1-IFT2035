@@ -1,3 +1,5 @@
+import Debug.Trace
+
 -- TP-1  --- Implantation d'une sorte de Lisp          -*- coding: utf-8 -*-
 {-# OPTIONS_GHC -Wall #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
@@ -224,18 +226,75 @@ data Ldec = Ldec Var Ltype      -- Déclaration globale.
 s2t :: Sexp -> Ltype
 s2t (Ssym "Int") = Lint
 -- ¡¡COMPLÉTER ICI!!
+--s2t (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "->")) (Ssym "Int")) = Larw Lint Lint
+
+-- (Scons (Scons (Scons Snil t1) (Ssym "->")) t2)
+s2t (Scons (Scons (Scons Snil t1) (Ssym "->")) t2) = Larw (s2t t1) (s2t t2)
+
+s2t sexpr = 
+  let 
+    liste = s2listS sexpr
+  in 
+    ls2t liste
+  {-
+  let
+    listSexpr@x:xs = s2listS sexpr
+  in
+    case listSexpr of
+      [t1, (Ssym "->"), t2 ] -> Larw (s2t t1) (s2t t2)
+      otherwise -> Larw (s2t x) 
+    if (x == Ssym "->") then 
+    Larw (s2t x) ()
+-}
+s2t se = error ("Type Psil inconnu: " ++ (showSexp se))
+
+------------------------------------------------------
+-- fonction que prends la liste et transforme en arrow
+
+ls2t :: [Sexp] -> Ltype
+ls2t list@(x:xs) =
+  case list of
+     [t1, (Ssym "->"), t2 ] -> Larw (s2t t1) (s2t t2)
+     _ -> Larw (s2t x) (ls2t xs) 
+
+list1 = [Ssym "Int",Ssym "->",Ssym "Int"]
+testL1 = trace (show list1) $ ls2t list1
+
+
+list2 = [Ssym "Int",Ssym "Int",Ssym "->",Ssym "Int"]
+testL2 = trace (show list2) $ ls2t list2
+
+
+list3 = [Ssym "Int",Ssym "Int",Ssym "Int",Ssym "->",Ssym "Int"]
+testL3 = trace (show list3) $ ls2t list3
+
+------------------------------------------------------
+
+-- fonction qui prend un Sexp et renvoie une liste de ses Sexp. 
+--Par exemple, sur (Scons (Scons (Scons Snil t1) (Ssym "->")) t2), elle renverrait [t1, Ssym "->", t2]. 
+s2listS :: Sexp -> [Sexp]
+s2listS (Scons Snil t1) = [t1]
+s2listS  (Scons e1 t2) = s2listS e1 ++ [t2] -- pas efficace, changer apres 
+
+e = (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "->")) (Ssym "Int"))
+e2 = (Scons (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "Int")) (Ssym "->")) (Ssym "Int"))
+e3 = (Scons (Scons (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "Int")) (Ssym "Int")) (Ssym "->")) (Ssym "Int"))
+test = trace (show e) $ s2listS e
+test2 = trace (show e2) $ s2listS e2
+test3 =  trace (show e3) $ s2listS e3
+
+{-
 s2t (Scons Snil e) = s2t e 
 --s2t (Scons (Scons (Scons Snil e1) (Ssym "->")) e2) = Larw (s2t e1) (s2t e2)
 s2t (Scons e (Ssym "->")) = s2t e
 s2t (Scons e1 e2) = Larw (s2t e1) (s2t e2) 
-
+-}
 --s2t (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "Int"))(Ssym "->")) = Larw Lint Lint
 --s2t (Scons e (Ssym "Int") ) = Larw Lint (s2t e)
 
 --s2l (Scons fct arg) = Lapp (s2l fct) (s2l arg)
 
 
-s2t se = error ("Type Psil inconnu: " ++ (showSexp se))
 
 -- "elabore" une expression de type Sexp en Lexp
 s2l :: Sexp -> Lexp
@@ -263,10 +322,16 @@ s2l (Scons fct arg) = Lapp (s2l fct) (s2l arg)
 -- 
 s2d :: Sexp -> Ldec
 s2d (Scons (Scons (Scons Snil (Ssym "def")) (Ssym v)) e) = Ldef v (s2l e)
-     
+
+--s2d (Scons (Scons (Scons Snil (Ssym "def")) (Ssym v)) e) =
+--    trace (show e) $ Ldef v (s2l e)
+
 -- ¡¡COMPLÉTER ICI!!
 
 s2d (Scons (Scons (Scons Snil (Ssym "dec")) (Ssym v)) e) = Ldec v (s2t e)
+--s2d (Scons (Scons (Scons Snil (Ssym "dec")) (Ssym v)) e) = 
+--  trace (show e) $ Ldec v (s2t e)
+
 
 s2d se = error ("Déclaration Psil inconnue: " ++ showSexp se)
 
@@ -394,6 +459,7 @@ eval _venv (Lnum n) = Vnum n
 eval venv (Lvar x) = mlookup venv x
 -- ¡¡COMPLÉTER ICI!!
 eval venv (Lhastype expr _) =  eval venv expr
+-- je pense qu'il faut verifier le type ici, car process_decl n'évalue pas, voir si il y a une autre partie qui evalue
 
 eval venv (Lapp fun arg) = -- fonction indsirée de la démo #4.1
   let
@@ -407,11 +473,14 @@ eval venv (Lapp fun arg) = -- fonction indsirée de la démo #4.1
 eval venv (Llet varName varExp expr) =
   let
     venv' = (varName, eval venv varExp) : venv -- appel par valeur?
+    --venv' = minsert venv varName (eval venv varExp)
   in
     eval venv' expr
 
 -- Lfun Var Lexp
 eval venv (Lfun var expr) = Vfun venv var expr
+-- eval venv (Lfun var exp) = Vop (\ (Vnum var) -> eval venv exp) -- expression bien typée, mais est-ce que ça fonctionne?
+
   -- il faut retourner Value 
                         -- Vnum Int
                         -- | Vfun VEnv Var Lexp
