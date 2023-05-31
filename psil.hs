@@ -226,30 +226,19 @@ data Ldec = Ldec Var Ltype      -- Déclaration globale.
 s2t :: Sexp -> Ltype
 s2t (Ssym "Int") = Lint
 -- ¡¡COMPLÉTER ICI!!
---s2t (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "->")) (Ssym "Int")) = Larw Lint Lint
-
--- (Scons (Scons (Scons Snil t1) (Ssym "->")) t2)
-s2t (Scons (Scons (Scons Snil t1) (Ssym "->")) t2) = Larw (s2t t1) (s2t t2)
+s2t (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "->")) (Ssym "Int")) = Larw Lint Lint
+--s2t (Scons (Scons (Scons Snil t1) (Ssym "->")) t2) = Larw (s2t t1) (s2t t2)
 
 s2t sexpr = 
   let 
     liste = s2listS sexpr
   in 
     ls2t liste
-  {-
-  let
-    listSexpr@x:xs = s2listS sexpr
-  in
-    case listSexpr of
-      [t1, (Ssym "->"), t2 ] -> Larw (s2t t1) (s2t t2)
-      otherwise -> Larw (s2t x) 
-    if (x == Ssym "->") then 
-    Larw (s2t x) ()
--}
+  
 s2t se = error ("Type Psil inconnu: " ++ (showSexp se))
 
 ------------------------------------------------------
--- fonction que prends la liste et transforme en arrow
+-- fonction qui prend la liste de Sexp et transforme en arrow
 
 ls2t :: [Sexp] -> Ltype
 ls2t list@(x:xs) =
@@ -257,31 +246,14 @@ ls2t list@(x:xs) =
      [t1, (Ssym "->"), t2 ] -> Larw (s2t t1) (s2t t2)
      _ -> Larw (s2t x) (ls2t xs) 
 
-list1 = [Ssym "Int",Ssym "->",Ssym "Int"]
-testL1 = trace (show list1) $ ls2t list1
-
-
-list2 = [Ssym "Int",Ssym "Int",Ssym "->",Ssym "Int"]
-testL2 = trace (show list2) $ ls2t list2
-
-
-list3 = [Ssym "Int",Ssym "Int",Ssym "Int",Ssym "->",Ssym "Int"]
-testL3 = trace (show list3) $ ls2t list3
-
-------------------------------------------------------
-
+-------------------------------------------------------
 -- fonction qui prend un Sexp et renvoie une liste de ses Sexp. 
---Par exemple, sur (Scons (Scons (Scons Snil t1) (Ssym "->")) t2), elle renverrait [t1, Ssym "->", t2]. 
+-- Par exemple, sur (Scons (Scons (Scons Snil t1) (Ssym "->")) t2), 
+-- elle renverrait [t1, Ssym "->", t2]. 
 s2listS :: Sexp -> [Sexp]
 s2listS (Scons Snil t1) = [t1]
-s2listS  (Scons e1 t2) = s2listS e1 ++ [t2] -- pas efficace, changer apres 
-
-e = (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "->")) (Ssym "Int"))
-e2 = (Scons (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "Int")) (Ssym "->")) (Ssym "Int"))
-e3 = (Scons (Scons (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "Int")) (Ssym "Int")) (Ssym "->")) (Ssym "Int"))
-test = trace (show e) $ s2listS e
-test2 = trace (show e2) $ s2listS e2
-test3 =  trace (show e3) $ s2listS e3
+s2listS  (Scons e1 t2) = (s2listS e1) ++ [t2] -- pas efficace, changer apres 
+-----------------------------------------------------     
 
 {-
 s2t (Scons Snil e) = s2t e 
@@ -292,7 +264,6 @@ s2t (Scons e1 e2) = Larw (s2t e1) (s2t e2)
 --s2t (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "Int"))(Ssym "->")) = Larw Lint Lint
 --s2t (Scons e (Ssym "Int") ) = Larw Lint (s2t e)
 
---s2l (Scons fct arg) = Lapp (s2l fct) (s2l arg)
 
 
 
@@ -366,18 +337,14 @@ tenv0 = [("+", Larw Lint (Larw Lint Lint)),
 -- `check Γ e τ` vérifie que `e` a type `τ` dans le contexte `Γ`.
 check :: TEnv -> Lexp -> Ltype -> Maybe TypeError
 -- ¡¡COMPLÉTER ICI!!
-
 ---------------
 {-Lfun Var Lexp -}
 -- Déclaration fonction anonyme
 -- Pour vérifier que la fonction a bien le type (t1 -> t2)
 -- 1º checker que expr a le type t2 dans l'env auquel on ajoute (x,t1)
--- 3º reenvoier Maybe TypeError
+-- 2º reenvoier Maybe TypeError
 check tenv (Lfun x expr) (Larw t1 t2) = check ((x,t1):tenv) expr t2
-
-
 ---------------
-
 
 check tenv e t
   -- Essaie d'inférer le type et vérifie alors s'il correspond au
@@ -418,14 +385,8 @@ synth tenv (Llet x e1 e2) =
   in 
     t2
 
-synth tenv (Lfun var _) = Larw Lint Lint -- juste pour tester l'exemple, ce n'est pas le cas general
- -- ça fonctionne l'exemple
- -- faire le cas general 
-  --mlookup tenv var
--- comment trouver le type d'une lfun ?
 synth _tenv e = error ("Incapable de trouver le type de: " ++ (show e))
 
-        
 ---------------------------------------------------------------------------
 -- Évaluateur                                                            --
 ---------------------------------------------------------------------------
@@ -433,7 +394,7 @@ synth _tenv e = error ("Incapable de trouver le type de: " ++ (show e))
 -- Type des valeurs renvoyées par l'évaluateur.
 data Value = Vnum Int
            | Vfun VEnv Var Lexp
-           | Vop (Value -> Value)
+           | Vop (Value -> Value) -- Vprim (Val → Val) -- Une primitive ?
 
 type VEnv = Map Var Value
 
@@ -458,34 +419,53 @@ eval :: VEnv -> Lexp -> Value
 eval _venv (Lnum n) = Vnum n
 eval venv (Lvar x) = mlookup venv x
 -- ¡¡COMPLÉTER ICI!!
-eval venv (Lhastype expr _) =  eval venv expr
--- je pense qu'il faut verifier le type ici, car process_decl n'évalue pas, voir si il y a une autre partie qui evalue
+eval venv (Lhastype expr t) =  
+  eval venv expr
+-- je pense qu'il faut verifier le type ici, car process_decl n'évalue pas, 
+--voir si il y a une autre partie qui evalue
 
-eval venv (Lapp fun arg) = -- fonction indsirée de la démo #4.1
-  let
-    valFun = eval venv fun
-    valArg = eval venv arg
-  in
-    case valFun of
-      Vnum _ -> error "n'est pas une fonction"
-      Vop f -> f valArg
+-- eval venv (Lapp fun arg) = -- fonction indsirée de la démo #4.1
+--   let
+--     valFun = eval venv fun
+--     valArg = eval venv arg
+--   in
+--     case valFun of
+--       Vnum _ -> error "n'est pas une fonction"
+--       Vop f -> f valArg
+--       _ -> error "faire le cas Vfun error inconu?"
+--       --Vfun f -> f valArg
+
+eval venv (Lapp fun actual) =
+  case (eval venv fun) of
+    Vfun funEnv formal body -> eval ((formal,(eval venv actual)) : funEnv) body
+    Vnum _ -> error "n'est pas une fonction"
+    Vop f -> f (eval venv actual)
+-- eval env (Elambda arg body) =
+--         Vfun env arg body
+-- eval env (Ecall fun actual) =
+--         case (eval env fun) of
+--             Vfun funEnv formal body -> eval ((formal, actual) : funEnv) body
+
 
 eval venv (Llet varName varExp expr) =
   let
-    venv' = (varName, eval venv varExp) : venv -- appel par valeur?
-    --venv' = minsert venv varName (eval venv varExp)
+    --venv' = (varName, eval venv varExp) : venv -- appel par valeur?
+    venv' = minsert venv varName (eval venv varExp)
   in
     eval venv' expr
 
--- Lfun Var Lexp
-eval venv (Lfun var expr) = Vfun venv var expr
--- eval venv (Lfun var exp) = Vop (\ (Vnum var) -> eval venv exp) -- expression bien typée, mais est-ce que ça fonctionne?
+-- data Value = Vnum Int
+--            | Vfun VEnv Var Lexp
+--            | Vop (Value -> Value) -- Vprim (Val → Val) -- Une primitive ?
 
-  -- il faut retourner Value 
-                        -- Vnum Int
-                        -- | Vfun VEnv Var Lexp
-                        -- | Vop (Value -> Value) 
-  
+-- je pense que si expr est une fonction il faut envoyer Vfun 
+-- eval venv (Lfun var (Lnum n)) = Vnum n 
+-- eval venv (Lfun var (Lvar x)) = mlookup venv x
+--eval venv (Lfun var expr) = Vfun venv var (eval venv exp)
+eval venv (Lfun var exp@(Lfun var2 exp2)) = Vfun venv var exp 
+eval venv (Lfun var expr) = Vfun venv var expr
+
+--eval venv (Lfun var exp) = Vop (\ (Vnum var) -> eval venv exp) -- expression bien typée, mais est-ce que ça fonctionne?
 
 -- État de l'évaluateur.
 type EState = ((TEnv, VEnv),       -- Contextes de typage et d'évaluation.
@@ -511,17 +491,35 @@ process_decl ((tenv, venv), Nothing, res) (Ldef x e) =
 -- ¡¡COMPLÉTER ICI!!
 
 process_decl ((tenv, venv), Just (v,t) , res) (Ldef x e) =
+  if check tenv e t == Nothing then    -- si le type de la définition correspond au type de la déclaration
+    let
+      val = eval venv e
+      venv' = minsert venv x val
+      tenv' = minsert tenv x t -- inserer, evaluer seulement si le meme
+
+    in
+      ((tenv', venv'), Nothing, (val, t) : res) -- ajouter à l'environnement
+  else
+    error "Défintion avec un type ne correspondant pas à la déclaration."
+
+--test5 = process_decl ((tenv, venv), Just (v,t) , res) (Ldef x e) 
+
+{-
+process_decl ((tenv, venv), Just (v,t) , res) (Ldef x e) =
     -- Le programmeur a *fourni* d'annotation ou a declaré de type pour `x`.
-    let ltype = synth tenv e
-        tenv' = minsert tenv x ltype
+    -- ne pas utiliser synth pour Lfun, utiliser plutot
+    -- utiliser check
+    if check v t then 
+      let ltype = t--synth tenv e
+        tenv' = minsert tenv x ltype -- inserer, evaluer seulement si le meme
         val = eval venv e
         venv' = minsert venv x val
-    in 
-      if t == ltype then
-        ((tenv', venv'), Nothing, (val, ltype) : res)
-      else
-        error ("variable déja declaré avec un autre type")
-
+      in 
+        if t == ltype then
+          ((tenv', venv'), Nothing, (val, ltype) : res)
+        else
+          error ("variable déja declaré avec un autre type")
+-}
 ---------------------------------------------------------------------------
 -- Toplevel                                                              --
 ---------------------------------------------------------------------------

@@ -1,0 +1,20 @@
+eval venv (Lhastype expr t) =  
+  {-check venv expr -}
+  eval venv expr
+-- je pense qu'il faut verifier le type ici, car process_decl n'évalue pas, 
+--vo
+
+data Value = Vnum Int
+           | Vfun VEnv Var Lexp
+           | Vop (Value -> Value)
+
+probleme du f1, quand on appele une fonction, quand on donne une valeur d'une Fonction
+il ne trouve pas la fonction dans l'environment
+les variables sont bien ajoutées 
+minsert pour les fonctions eval 
+
+
+ecrire des testes
+
+
+

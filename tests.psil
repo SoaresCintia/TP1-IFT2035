@@ -8,4 +8,7 @@
 (def r1 2)  
 (def tr1 (if0 (- r1 2) 1 0))
 
+(dec test (Int Int (Int Int -> Int) -> Int))
+(def test (4 3 (+)))
+
 
