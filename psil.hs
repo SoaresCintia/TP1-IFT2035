@@ -437,15 +437,27 @@ eval venv (Lhastype expr t) =
 
 eval venv (Lapp fun actual) =
   case (eval venv fun) of
-    Vfun funEnv formal body -> eval ((formal,(eval venv actual)) : funEnv) body
     Vnum _ -> error "n'est pas une fonction"
+
+    Vfun funEnv formal body -> eval ((formal,(eval venv actual)) : funEnv) body
+    --Vop f -> f (eval venv actual)
     Vop f -> f (eval venv actual)
+
+-- Exercices 5.3 et 4.1    
 -- eval env (Elambda arg body) =
 --         Vfun env arg body
 -- eval env (Ecall fun actual) =
 --         case (eval env fun) of
 --             Vfun funEnv formal body -> eval ((formal, actual) : funEnv) body
 
+-- eval env (Ecall fn arg) =
+--         let
+--             valFn = eval env fn
+--             valArg = eval env arg
+--         in
+--             case valFn of
+--                 Vnum _ -> error "La valeur appelée n'est pas une fonction"
+--                 Vprim f -> f valArg
 
 eval venv (Llet varName varExp expr) =
   let
@@ -462,7 +474,10 @@ eval venv (Llet varName varExp expr) =
 -- eval venv (Lfun var (Lnum n)) = Vnum n 
 -- eval venv (Lfun var (Lvar x)) = mlookup venv x
 --eval venv (Lfun var expr) = Vfun venv var (eval venv exp)
-eval venv (Lfun var exp@(Lfun var2 exp2)) = Vfun venv var exp 
+eval venv (Lfun var exp@(Lfun var2 exp2)) = 
+  let analyse = eval venv (Lfun var2 exp2)
+  in Vfun venv var exp 
+  
 eval venv (Lfun var expr) = Vfun venv var expr
 
 --eval venv (Lfun var exp) = Vop (\ (Vnum var) -> eval venv exp) -- expression bien typée, mais est-ce que ça fonctionne?
@@ -502,24 +517,6 @@ process_decl ((tenv, venv), Just (v,t) , res) (Ldef x e) =
   else
     error "Défintion avec un type ne correspondant pas à la déclaration."
 
---test5 = process_decl ((tenv, venv), Just (v,t) , res) (Ldef x e) 
-
-{-
-process_decl ((tenv, venv), Just (v,t) , res) (Ldef x e) =
-    -- Le programmeur a *fourni* d'annotation ou a declaré de type pour `x`.
-    -- ne pas utiliser synth pour Lfun, utiliser plutot
-    -- utiliser check
-    if check v t then 
-      let ltype = t--synth tenv e
-        tenv' = minsert tenv x ltype -- inserer, evaluer seulement si le meme
-        val = eval venv e
-        venv' = minsert venv x val
-      in 
-        if t == ltype then
-          ((tenv', venv'), Nothing, (val, ltype) : res)
-        else
-          error ("variable déja declaré avec un autre type")
--}
 ---------------------------------------------------------------------------
 -- Toplevel                                                              --
 ---------------------------------------------------------------------------
