@@ -448,13 +448,16 @@ process_decl ((tenv, venv), Nothing, res) (Ldef x e) =
 -- ¡¡COMPLÉTER ICI!!
 
 process_decl ((tenv, venv), Just (_,t) , res) (Ldef x e) =
+    -- Le programmeur a *fourni* d'annotation de type pour `x`.
     let
-      val = eval venv' e
+      -- `e` doit être évalué dans l'environement auquel il existe déjà `x` et 
+      -- sa valeur. Cela est indispensable pour les fonctions recursives
+      val = eval venv' e 
       venv' = minsert venv x val
+
       tenv' = minsert tenv x t 
     in
-      if check tenv' e t == Nothing 
-      then 
+      if check tenv' e t == Nothing then 
         ((tenv', venv'), Nothing, (val, t) : res) 
       else
         error "Défintion avec un type ne correspondant pas à la déclaration."
