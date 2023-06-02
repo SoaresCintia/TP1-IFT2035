@@ -1,4 +1,3 @@
-
 ;; Expressions "let"
 (def test1 (let ((x 0)) (let ((x 1)) (* x 1))))                 ; ↝ 1 : Int
 
@@ -18,9 +17,9 @@
 (def test5a (test5 2 3))                                        ; ↝ 5 : Int
 
 ;; Fonction définie avec une fonction partiellement évaluée
-;(dec test6 (Int -> Int))
-;(def test6 (test5 9))                                           ; <fermture> : Int -> Int
-;(def test6a (test6 (-3)))                                        ; ↝ 6 : Int
+(dec test6 (Int -> Int))
+(def test6 (test5 9))                                           ; <fermture> : Int -> Int
+(def test6a (test6 (-3)))                                        ; ↝ 6 : Int
 
 ;; Fonction évaluant une expression "let" ??
 ;; TODO
@@ -29,33 +28,8 @@
 ;; TODO
 
 ;; Vérifications de types
-;(def test10a (: 20 Int))
-;(def test10b (: (if0 0) (Int Int -> Int)))
-;(def test10c (: (+ 1) (Int -> Int)))
-;(def test10d (: test5 (Int Int -> Int)))
-;(def test10e (: (fun x (fun y (+ y x))) (Int Int -> Int)))
-
-
-
-
-
-
-
-
-
-
-
-;;(def test1 (let ((x 0)) (let ((x 1)) (* x 9))))                 ; ↝ 9 : Int
-;; (def test2 (let ((x 1)) (let ((x 1)) (let ((x 0)) (* x 9)))))   ; ↝ 0 : Int
-
-;; (def funInc (fun x (x+1)) (let ((funInc)) (funInc 1)))
-;(def funInc (fun x (x+1)))
-;;(let ((funInc)) (funInc 1))
-
-(def r1 2)  
-(def tr1 (if0 (- r1 2) 1 0))
-
-(dec test (Int Int (Int Int -> Int) -> Int))
-(def test (4 3 (+)))
-
-
+(def test10a (: 20 Int))
+(def test10b (: (if0 0) (Int Int -> Int)))
+(def test10c (: (+ 1) (Int -> Int)))
+(def test10d (: test5 (Int Int -> Int)))
+(def test10e (: (fun x (fun y (+ y x))) (Int Int -> Int)))
