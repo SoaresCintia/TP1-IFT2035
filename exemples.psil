@@ -46,8 +46,7 @@
 ; ca fait le processus recursive juste une fois 
 (dec fact (Int -> Int))
 (def fact (fun n (if0 n 1 (* n (fact (- n 1))))))
-(def factTest (fact 4))                         ; ↝ 24 : Int
-
+(def factTest (fact 5))                         ; ↝ 120 : Int
 
 ; on declare recursive comme une variable qui contient un entier
 ; on definit recursive comme le resultat de l'appel de f1 avec recursive et 37

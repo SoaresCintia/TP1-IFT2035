@@ -451,18 +451,18 @@ process_decl ((tenv, venv), Nothing, res) (Ldef x e) =
     in ((tenv', venv'), Nothing, (val, ltype) : res)
 -- ¡¡COMPLÉTER ICI!!
 
-process_decl ((tenv, venv), Just (v,t) , []) (def@(Ldef x e)) =
-  -- le problème est dans le check
-    let
-      venv' = minsert venv x (Vop (\a -> a))--(error ("variable pas encore définie"))--(Vop (\a -> a))--(Vnum 0) --choisi au hasard
-      val = eval venv' e --(trace(show(x))$e)
-      venv'' = minsert venv' x val
-      tenv' = minsert tenv v t -- si j'envoie tenv à la place de tenv' ça reconnait pas g
-    in
-      if check tenv' e t == Nothing then    -- si le type de la définition correspond au type de la déclaration
-          ((tenv', venv''), Nothing, [(val, t)]) 
-      else
-        error "Défintion avec un type ne correspondant pas à la déclaration."
+-- process_decl ((tenv, venv), Just (v,t) , []) (def@(Ldef x e)) =
+--   -- le problème est dans le check
+--     let
+--       venv' = minsert venv x (Vop (\a -> a))--(error ("variable pas encore définie"))--(Vop (\a -> a))--(Vnum 0) --choisi au hasard
+--       val = eval venv' e --(trace(show(x))$e)
+--       venv'' = minsert venv' x val
+--       tenv' = minsert tenv v t -- si j'envoie tenv à la place de tenv' ça reconnait pas g
+--     in
+--       -- if check tenv' e t == Nothing then    -- si le type de la définition correspond au type de la déclaration
+--           ((tenv', venv''), Nothing, [(val, t)]) 
+--       -- else
+--       --   error "Défintion avec un type ne correspondant pas à la déclaration."
 
 --process_decl ((tenv, venv), Just (v,t) , res@((lastVal, lastType):res2)) (def@(Ldef x e)) = 
 process_decl ((tenv, venv), Just (v,t) , res) (def@(Ldef x e)) =
@@ -475,7 +475,7 @@ process_decl ((tenv, venv), Just (v,t) , res) (def@(Ldef x e)) =
       --   Vfun venv var lexp -> venv
       --   Vop _ -> venv
       --   _ -> (error ("variable pas encore définie"))
-      val = eval venv e--(trace(show(e))$e)
+      val = eval venv' e--(trace(show(e))$e)
       venv' = minsert venv x val--(trace(show(val))$val)--val
       tenv' = minsert tenv x t 
       --venv'' = minsert venv' x (Vfun venv x e)
@@ -488,7 +488,7 @@ process_decl ((tenv, venv), Just (v,t) , res) (def@(Ldef x e)) =
           --process_decl ((tenv', venv''), Nothing , (val, t) : res) (def)
           --((tenv', venv''), Nothing, (val, t) : res) 
           ((tenv', venv'), Nothing, (val, t) : res) 
-      else
+       else
         error "Défintion avec un type ne correspondant pas à la déclaration."
 
 
