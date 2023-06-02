@@ -16,11 +16,27 @@
 ; mon exemple
 (dec g (Int -> Int))
 (def g (fun y (+ y 5)))
+(def test (g 4))                                 ; ↝ 9 : Lint
 
-(def test (g 5))
+; mon exemple 2
+(dec g2 (Int Int -> Int))
+(def g2 (fun x (fun y (+ x y))))
+(def test2 (g2 4 9))                             ; ↝ 13 : Lint
+
+(def g3 (let ((x 3)) (g2 x 4)))                  ; ↝ 7 : Lint
+
+; essayer de faire une exemple pour tester la porté statique
+; comme l'exemple zoom des notes des cours
 
 (dec f1 (Int Int -> Int))
 (def f1 (fun x (fun y (+ y 5))))                 ; ↝ <fonction> : Int -> Int -> Int
 
+(def f1test (f1 3 1))                            ; ↝ 6 : Lint
+
 (dec recursive Int)
 (def recursive (f1 recursive 37))                ; ↝ 42 : Int
+
+; on declare recursive comme une variable qui contient un entier
+; on definit recursive comme le resultat de l'appel de f1 avec recursive et 37
+; le probleme est que recursive n'est pas encore définit 
+; comment contourner ce problème ?

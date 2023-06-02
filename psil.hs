@@ -1,3 +1,7 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use isNothing" #-}
+{-# HLINT ignore "Use putStr" #-}
+{-# HLINT ignore "Use concatMap" #-}
 import Debug.Trace
 
 -- TP-1  --- Implantation d'une sorte de Lisp          -*- coding: utf-8 -*-
@@ -226,25 +230,25 @@ data Ldec = Ldec Var Ltype      -- Déclaration globale.
 s2t :: Sexp -> Ltype
 s2t (Ssym "Int") = Lint
 -- ¡¡COMPLÉTER ICI!!
-s2t (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "->")) (Ssym "Int")) = Larw Lint Lint
---s2t (Scons (Scons (Scons Snil t1) (Ssym "->")) t2) = Larw (s2t t1) (s2t t2)
+--s2t (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "->")) (Ssym "Int")) = Larw Lint Lint
+s2t (Scons (Scons (Scons Snil t1) (Ssym "->")) t2) = Larw (s2t t1) (s2t t2)
 
 s2t sexpr = 
   let 
     liste = s2listS sexpr
   in 
-    ls2t liste
+    listS2t liste
   
 s2t se = error ("Type Psil inconnu: " ++ (showSexp se))
 
 ------------------------------------------------------
 -- fonction qui prend la liste de Sexp et transforme en arrow
 
-ls2t :: [Sexp] -> Ltype
-ls2t list@(x:xs) =
+listS2t :: [Sexp] -> Ltype
+listS2t list@(x:xs) =
   case list of
      [t1, (Ssym "->"), t2 ] -> Larw (s2t t1) (s2t t2)
-     _ -> Larw (s2t x) (ls2t xs) 
+     _ -> Larw (s2t x) (listS2t xs) 
 
 -------------------------------------------------------
 -- fonction qui prend un Sexp et renvoie une liste de ses Sexp. 
@@ -254,18 +258,6 @@ s2listS :: Sexp -> [Sexp]
 s2listS (Scons Snil t1) = [t1]
 s2listS  (Scons e1 t2) = (s2listS e1) ++ [t2] -- pas efficace, changer apres 
 -----------------------------------------------------     
-
-{-
-s2t (Scons Snil e) = s2t e 
---s2t (Scons (Scons (Scons Snil e1) (Ssym "->")) e2) = Larw (s2t e1) (s2t e2)
-s2t (Scons e (Ssym "->")) = s2t e
-s2t (Scons e1 e2) = Larw (s2t e1) (s2t e2) 
--}
---s2t (Scons (Scons (Scons Snil (Ssym "Int")) (Ssym "Int"))(Ssym "->")) = Larw Lint Lint
---s2t (Scons e (Ssym "Int") ) = Larw Lint (s2t e)
-
-
-
 
 -- "elabore" une expression de type Sexp en Lexp
 s2l :: Sexp -> Lexp
@@ -421,66 +413,20 @@ eval venv (Lvar x) = mlookup venv x
 -- ¡¡COMPLÉTER ICI!!
 eval venv (Lhastype expr t) =  
   eval venv expr
--- je pense qu'il faut verifier le type ici, car process_decl n'évalue pas, 
---voir si il y a une autre partie qui evalue
-
--- eval venv (Lapp fun arg) = -- fonction indsirée de la démo #4.1
---   let
---     valFun = eval venv fun
---     valArg = eval venv arg
---   in
---     case valFun of
---       Vnum _ -> error "n'est pas une fonction"
---       Vop f -> f valArg
---       _ -> error "faire le cas Vfun error inconu?"
---       --Vfun f -> f valArg
 
 eval venv (Lapp fun actual) =
   case (eval venv fun) of
     Vnum _ -> error "n'est pas une fonction"
-
     Vfun funEnv formal body -> eval ((formal,(eval venv actual)) : funEnv) body
-    --Vop f -> f (eval venv actual)
     Vop f -> f (eval venv actual)
-
--- Exercices 5.3 et 4.1    
--- eval env (Elambda arg body) =
---         Vfun env arg body
--- eval env (Ecall fun actual) =
---         case (eval env fun) of
---             Vfun funEnv formal body -> eval ((formal, actual) : funEnv) body
-
--- eval env (Ecall fn arg) =
---         let
---             valFn = eval env fn
---             valArg = eval env arg
---         in
---             case valFn of
---                 Vnum _ -> error "La valeur appelée n'est pas une fonction"
---                 Vprim f -> f valArg
 
 eval venv (Llet varName varExp expr) =
   let
-    --venv' = (varName, eval venv varExp) : venv -- appel par valeur?
     venv' = minsert venv varName (eval venv varExp)
   in
     eval venv' expr
-
--- data Value = Vnum Int
---            | Vfun VEnv Var Lexp
---            | Vop (Value -> Value) -- Vprim (Val → Val) -- Une primitive ?
-
--- je pense que si expr est une fonction il faut envoyer Vfun 
--- eval venv (Lfun var (Lnum n)) = Vnum n 
--- eval venv (Lfun var (Lvar x)) = mlookup venv x
---eval venv (Lfun var expr) = Vfun venv var (eval venv exp)
-eval venv (Lfun var exp@(Lfun var2 exp2)) = 
-  let analyse = eval venv (Lfun var2 exp2)
-  in Vfun venv var exp 
   
 eval venv (Lfun var expr) = Vfun venv var expr
-
---eval venv (Lfun var exp) = Vop (\ (Vnum var) -> eval venv exp) -- expression bien typée, mais est-ce que ça fonctionne?
 
 -- État de l'évaluateur.
 type EState = ((TEnv, VEnv),       -- Contextes de typage et d'évaluation.
@@ -505,17 +451,18 @@ process_decl ((tenv, venv), Nothing, res) (Ldef x e) =
     in ((tenv', venv'), Nothing, (val, ltype) : res)
 -- ¡¡COMPLÉTER ICI!!
 
-process_decl ((tenv, venv), Just (v,t) , res) (Ldef x e) =
-  if check tenv e t == Nothing then    -- si le type de la définition correspond au type de la déclaration
+process_decl ((tenv, venv), Just (v,t) , res) (def@(Ldef x e)) =
+  -- le problème est dans le check
     let
-      val = eval venv e
-      venv' = minsert venv x val
-      tenv' = minsert tenv x t -- inserer, evaluer seulement si le meme
-
+      venv' = minsert venv x (Vnum 0) --(Vop (\a -> a)) -- Vnum 0 choisi au hasard
+      val = eval venv' e --(trace(show(x))$e)
+      venv'' = minsert venv' x val
+      tenv' = minsert tenv v t -- si j'envoie tenv à la place de tenv' ça reconnait pas g
     in
-      ((tenv', venv'), Nothing, (val, t) : res) -- ajouter à l'environnement
-  else
-    error "Défintion avec un type ne correspondant pas à la déclaration."
+      if check tenv' e t == Nothing then    -- si le type de la définition correspond au type de la déclaration
+          ((tenv', venv''), Nothing, (val, t) : res) 
+      else
+        error "Défintion avec un type ne correspondant pas à la déclaration."
 
 ---------------------------------------------------------------------------
 -- Toplevel                                                              --
@@ -524,7 +471,7 @@ process_decl ((tenv, venv), Just (v,t) , res) (Ldef x e) =
 process_sexps :: EState -> [Sexp] -> IO ()
 process_sexps _ [] = return ()
 process_sexps es (sexp : sexps) =
-    let decl = s2d sexp
+    let decl = s2d sexp --trace (show(sexp))$s2d sexp
         (env', pending, res) = process_decl es decl
     in do (hPutStr stdout)
             (concat
