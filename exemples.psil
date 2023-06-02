@@ -25,6 +25,11 @@
 
 (def g3 (let ((x 3)) (g2 x 4)))                  ; ↝ 7 : Lint
 
+(dec g4 (Int (Int -> Int) -> Int))
+(def g4 (fun x (fun funarg (funarg x))))        ; ↝ <fermeture> : Int -> (Int -> Int) -> Int
+                                                ;   <fermeture> : Larw Lint (Larw (Larw Lint Lint) Lint)
+(def g4test (g4 100 r4))                        ; ↝ 102 : Lint
+
 ; essayer de faire une exemple pour tester la porté statique
 ; comme l'exemple zoom des notes des cours
 
@@ -35,6 +40,14 @@
 
 (dec recursive Int)
 (def recursive (f1 recursive 37))                ; ↝ 42 : Int
+
+
+
+; ca fait le processus recursive juste une fois 
+(dec fact (Int -> Int))
+(def fact (fun n (if0 n 1 (* n (fact (- n 1))))))
+(def factTest (fact 4))                         ; ↝ 24 : Int
+
 
 ; on declare recursive comme une variable qui contient un entier
 ; on definit recursive comme le resultat de l'appel de f1 avec recursive et 37
