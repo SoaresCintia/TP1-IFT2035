@@ -1,61 +1,66 @@
-
 ;; Expressions "let"
-(def test1 (let ((x 0)) (let ((x 1)) (* x 1))))                 ; ↝ 1 : Int
+(def r1 (let ((x 0)) (let ((x 1)) (* x 1))))                 ; ↝ 1 : Int
+(def testr1 (if0 (- r1 1) 1 0))                              ; ↝ 1 : Int
 
-(def test2 (let ((x 0)) (let ((x 0)) (let ((x 1)) (* x 2)))))   ; ↝ 2 : Int
+(def r2 (let ((x 0)) (let ((x 0)) (let ((x 1)) (* x 2)))))   ; ↝ 2 : Int
+(def testr2 (if0 (- r2 2) 1 0))                              ; ↝ 1 : Int
 
-(dec test3 Int)
-(def test3 (if0 (- test2 2) (let ((x 10)) (let ((x 1)) (* x 3))) 0))  ; ↝ 3 : Int
+(dec r3 Int)
+(def r3 (if0 (- r2 2) (let ((x 10)) (let ((x 1)) (* x 3))) 0))  ; ↝ 3 : Int
+(def testr3 (if0 (- r3 3) 1 0))                                 ; ↝ 1 : Int
 
 ;; Appel de fonctions à 1 argument
-(dec test4 (Int -> Int))
-(def test4 (fun y (+ y 2)))                                     ; ↝ <fonction> : Int -> Int
-(def test4a (test4 2))                                          ; ↝ 4 : Int
+(dec r4 (Int -> Int))
+(def r4 (fun y (+ y 2)))                           ; ↝ <fermeture> : Int -> Int
+(def r4p (r4 2))                                     ; ↝ 4 : Int
+(def testr4p (if0 (- r4p 4) 1 0))                    ; ↝ 1 : Int
 
 ;; Appel de fonction à 2 arguments
-(dec test5 (Int Int -> Int))
-(def test5 (fun x (fun y (+ y x))))                             ; ↝ <fermeture> : Int -> Int -> Int
-(def test5a (test5 2 3))                                        ; ↝ 5 : Int
+(dec r5 (Int Int -> Int))
+(def r5 (fun x (fun y (+ y x))))            ; ↝ <fermeture> : Int -> Int -> Int
+(def r5p (r5 2 3))                          ; ↝ 5 : Int
+(def testr5p (if0 (- r5p 5) 1 0))           ; ↝ 1 : Int
 
 ;; Fonction définie avec une fonction partiellement évaluée
-;(dec test6 (Int -> Int))
-;(def test6 (test5 9))                                           ; <fermture> : Int -> Int
-;(def test6a (test6 (-3)))                                        ; ↝ 6 : Int
+(dec r6 (Int -> Int))
+(def r6 (r5 9))                                ; <fermture> : Int -> Int
+(def r6p (r6 (-3)))                            ; ↝ 6 : Int
+(def testr6p (if0 (- r6p 6) 1 0))              ; ↝ 1 : Int
+
+;; Fonction qui prend une fonction en argument
+(dec r7 (Int (Int -> Int) -> Int))
+(def r7 (fun x (fun f (f x))))     ; ↝ <fermeture> : Int -> (Int -> Int) -> Int                                               
+(def r7p (r7 100 r4))              ; ↝ 102 : Lint
+(def testr7p (if0 (- r7p 102) 1 0)); ↝ 1 : Int
+
 
 ;; Fonction évaluant une expression "let" ??
 ;; TODO
+(dec r8 (Int Int -> Int))
+(def r8 (fun x (fun y (+ x y))))       ; ↝ <fermeture> : Int -> Int -> Int
+(def r8pl (let ((x 3)) (r8 x 4)))      ; ↝ 7 : Lint
+
+;; Test porté statique 
+; TODO
+; ; essayer de faire une exemple pour tester la porté statique
+; comme l'exemple zoom des notes des cours ?
 
 ;; Récursion
-;; TODO
+(dec fact (Int -> Int))
+(def fact (fun n (if0 n 1 (* n (fact (- n 1)))))) ; <fermture> : Int -> Int
+(def r9 (fact 5))                                 ; ↝ 120 : Int
+(def testr9 (if0 (- r9 120) 1 0))                 ; ↝ 1 : Int
 
 ;; Vérifications de types
-;(def test10a (: 20 Int))
-;(def test10b (: (if0 0) (Int Int -> Int)))
-;(def test10c (: (+ 1) (Int -> Int)))
-;(def test10d (: test5 (Int Int -> Int)))
-;(def test10e (: (fun x (fun y (+ y x))) (Int Int -> Int)))
+(def test10a (: 20 Int))                    ; ↝ 20 : Int
+(def test10b (: (if0 0) (Int Int -> Int)))  ; ↝ <fonction> : Int -> Int -> Int
+(def test10c (: (+ 1) (Int -> Int)))        ; ↝ <fonction> : Int -> Int
+(def test10d (: r5 (Int Int -> Int)))       ; ↝ <fermture>  : Int -> Int -> Int
+(def test10e (: (fun x (fun y (+ y x))) (Int Int -> Int))) 
+; ↝ <fermture>  : Int -> Int -> Int
 
-
-
-
-
-
-
-
-
-
-
-;;(def test1 (let ((x 0)) (let ((x 1)) (* x 9))))                 ; ↝ 9 : Int
-;; (def test2 (let ((x 1)) (let ((x 1)) (let ((x 0)) (* x 9)))))   ; ↝ 0 : Int
-
-;; (def funInc (fun x (x+1)) (let ((funInc)) (funInc 1)))
-;(def funInc (fun x (x+1)))
-;;(let ((funInc)) (funInc 1))
-
-(def r1 2)  
-(def tr1 (if0 (- r1 2) 1 0))
-
-(dec test (Int Int (Int Int -> Int) -> Int))
-(def test (4 3 (+)))
-
-
+;(def test10f (: 20 (Int -> Int)))         ; ↝ Erreur de type: Int -> Int ≠ Int
+;(def test10g (: (+ 1) Int))               ; ↝ Erreur de type: Int ≠ Int -> Int
+;(dec test10h (Int -> Int))                  
+;(def test10h 2)                     ; *** Exception: Défintion avec un type ne 
+                                     ; correspondant pas à la déclaration.
