@@ -1,3 +1,9 @@
+;; TP-1  --- Implantation d'une sorte de Lisp   
+;; 3 juin 2023
+;; Auteurs: Cintia Dalila Soares - C2791
+;;          Carl Thibault - 0985781
+
+
 ;; Expressions "let"
 (def r1 (let ((x 0)) (let ((x 1)) (* x 1))))                 ; ↝ 1 : Int
 (def testr1 (if0 (- r1 1) 1 0))                              ; ↝ 1 : Int
