@@ -332,7 +332,7 @@ check :: TEnv -> Lexp -> Ltype -> Maybe TypeError
 
 ---------------------------------------------------------------------------
 -- Pour vérifier que la fonction a bien le type `(t1 -> t2)`
--- il faut vérifier que `e` a le type `t2` dans l'environement auquel on a 
+-- il faut vérifier que `e` a le type `t2` dans l'environement où on a 
 -- ajouté `(x,t1)`
 check tenv (Lfun x e) (Larw t1 t2) = check ((x,t1):tenv) e t2
 ---------------------------------------------------------------------------
