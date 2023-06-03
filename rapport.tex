@@ -1,0 +1,81 @@
+\documentclass[11pt, letterpaper]{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{hyperref}
+
+\title{IFT2035 - TP1}
+\author{Cintia Dalila Soares - C2791\\
+ Carl Thibault - p0985781}
+\date{3 juin 2023}
+
+\begin{document}
+
+\maketitle
+
+%---------------------------------------------------------------------------
+\section{Compréhension de l'énoncé}
+
+\subsection{Premier contact} 
+Nous avons débuté le travail pratique par une lecture individuelle de l'énoncé et du code source fournis. Le premier contact avec ceux-ci nous a révélé certaines de nos lacunes dans notre compréhension des sujets abordés, notamment quant aux règles de typages, le fonctionnement d'un évaluateur, certaines expressions en Haskell, etc.\\
+
+Le premier contact avec le code source a été plutôt intimidant. Plusieurs lectures ont été requises avant de commencer à bien comprendre comment s'articule chacune des parties. Des outils comme ChatGPT nous ont permis de décomposer le fonctionnement de certaines fonctions en nous offrant une interprétation du code fourni.
+
+\subsection{Approfondissement} 
+
+Ensuite, une lecture commune de l'énoncé nous aura permis de partager nos idées et notre compréhension et de colmater certaines "failles" avec nos compréhensions complémentaires.\\
+
+La préparation pour l'examen intra nous a permis de consolider certaines connaissances requises à la compréhension du travail pratique. En effet, nous avions une compréhension peut-être trop superficielle de certains sujets qui freinait ainsi notre capacité à la mise en pratique.\\
+
+Pour d'autres sujets comme les règles de typage, il a été nécessaire de trouver des ressources supplémentaires pour bien comprendre le formalisme des annotations et leur signification. En ce sens l'article de Jeremy Siek présent sur la page du cours a bien guidé notre compréhension.
+
+%---------------------------------------------------------------------------
+\section{Processus de programmation et problèmes rencontrés}
+
+\subsection{L'importance cruciale du "pair programming"}
+À bien des égards, ce travail pratique aurait été beaucoup plus difficile à accomplir seul. Il y avait assurément une complémentarité entre les membres de l'équipe quant à la compréhension de certaines parties du TP. Nos discussions périodiques nous ont permis de cerner l'origine de certains problèmes et de débloquer certaines impasses que nous rencontrions dans le travail individuel que nous faisions. \\
+
+Le va-et-vient entre travail individuel et collaboratif a été bénéfique à notre avancement. Souvent, simplement d'expliciter verbalement, étape par étape, comment devrait fonctionner le code nous permettait de voir où se logeait un problème et de retracer le mauvais raisonnement qu'un de nous aurait pu avoir (une sorte de "Rubber duck debugging" collectif).
+
+\subsection{Debugging}
+Nous avons eu a développer différentes stratégies de debugging pour bien comprendre et vérifier le comportement du code que nous écrivions. Ainsi, la programmation pilotée par les tests a été d'une importance cruciale pour s'assurer qu'à chaque étape de développement le comportement souhaité était respecté et conservé. L'utilisation de la librairie "Debug.Trace" a aussi été utile pour observer les valeurs renvoyées par certaines fonctions.
+
+\subsection{Approcher et utiliser la récursivité}
+Bien qu'en général nous comprenions bien les exemples de fonctions récursives proposés lors des séances de cours et en démos, ça devenait rapidement une autre paire de manches lorsque venait le temps d'utiliser ces concepts pour résoudre nous même des problèmes spécifiques. Beaucoup de temps a ainsi été requis avant de se faire la main à la récursivité et à comprendre comment l'exploiter dans Haskell dans le contexte de ce TP.
+
+
+\subsection{Vérification et synthèse de types}
+
+Il s'agissait de la partie du TP qui avait été la moins abordée en séance de travaux pratiques, nous avons donc dû développer nous-mêmes les méthodes pour effectuer la vérification des types. Pour mieux comprendre les notations des règles de typage et le processus de vérification et synthèse de types, \href{https://siek.blogspot.com/2012/07/crash-course-on-notation-in-programming.html}{l'article de Jeremy Siek} nous a bien guidés. \\
+% 
+
+La décomposition des étapes de chaque règle de vérification ou de synthèse de types nous a aussi beaucoup aidés à clarifier celles-ci afin de les traduire en code Haskell. Par exemple, pour vérifier que l'expression de la forme : (Lfun var exp) a bien le type $(\tau_1 \rightarrow \tau_2)$ il faut :
+\begin{enumerate}
+    \item vérifier que exp a le type $\tau_2$ dans l'environement auquel on ajouté (var,$\tau_1)$;
+    \item  renvoyer Nothing si tout va bient ou une erreur si le type ne correspond pas.
+\end{enumerate}
+
+Pour synthétiser le type d'un appel de fonction de la forme (Lapp $e_1$ $e_2$), il faut:
+\begin{enumerate}
+\item synthétiser le type $(\tau_1 \rightarrow \tau_2)$ en analysant $e_1$;
+\item vérifier que $e_2$ a le type $\tau_1$;
+\item si oui, renvoyer le type $\tau_2$.
+\end{enumerate}
+
+\subsection{Les difficultés de la programmation fonctionnelle}
+La programmation fonctionnelle est un paradigme de programmation complètement différent que nous avons eu de la difficulté à initialement approcher. Certains réflexes de programmation impérative nous ont ralentis dans la résolution de certaines problématiques. L'idée d'évaluation paresseuse peut être contre-intuitive de prime abord et nous avions le réflexe de déclarer certaines variables et leurs valeurs alors que c'était inutile.
+
+\subsection{Compréhension des types de données fournis}
+Une certaine confusion est apparue lors de l'implémentation de l'évaluation des fonctions, il a été difficile pour nous de distinguer si nous devions utiliser \texttt{Vop} ou bien \texttt{Vfun} pour les définir et comment les deux pouvaient être utilisés. Après quelque temps, nous avons compris comment exploiter ces types de données en créant des "cases" spécifiques dans l'évaluation des appels de fonctions.
+
+\subsection{Évaluation des fonctions récursives}
+Une des dernières et plus coriaces problématiques que nous avons rencontrées a été de faire fonctionner l'évaluation des fonctions récursives. Plusieurs stratégies ont dû être testées avant d'arriver à une solution finale. Le processus nous a vraiment permis de comprendre les dessous de la programmation fonctionnelle en nous obligeant à bien comprendre l'évaluation paresseuse pour bien faire fonctionner l'évaluation de ces fonctions.
+
+\section{Conclusions}
+L'infâme TP du cours IFT2035 nous a semblé plus facile que ce que la réputation qui le précédait nous laissait croire, probablement que celui-ci a été remanié avec le temps, mais que la légende continue d'être transmise. L'énoncé du TP était clair, mais nous a demandé beaucoup de relectures avant de bien le comprendre. Nous avions à notre disposition la plupart des ressources pour mener le TP à terme et la consultation des exercices fait en démonstration nous a permis de progresser sur la plupart des parties quand on se sentait bloqué (la plupart des problèmes y étant traités de telle façon qu'on pouvait fortement s'y inspirer). Certaines parties du travail pratique demandaient plus de réflexions et de créativité, mais en s'y prenant assez tôt la plupart des problèmes qu'on rencontrait trouvaient leurs solutions. La clé du succès est probablement de ne pas trop attendre à la dernière minute pour entamer le TP.\\
+
+Bien que nous croyons avoir réussi à régler la plupart des problèmes, certaines parties du code fourni restent encore cryptiques (surtout les portions quant à l'analyseur lexical et les fonctions "run" et "process\_sexps"). Dans notre cas, il n'a pas été requis de modifier des parties du code fourni pour compléter le TP.\\
+
+Au terme de ce travail pratique, nous sommes heureux d'un peu mieux comprendre les dessous d'un compilateur / interpréteur et d'un peu mieux comprendre la programmation fonctionnelle, nous ferons de notre mieux pour intégrer ces précieux enseignements dans la suite de notre parcours.
+
+\end{document}
