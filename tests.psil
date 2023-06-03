@@ -57,6 +57,14 @@
 (def r9 (fact 5))                                 ; ↝ 120 : Int
 (def testr9 (if0 (- r9 120) 1 0))                 ; ↝ 1 : Int
 
+(dec fibonacci (Int -> Int))
+(def fibonacci (fun n (if0 n 0 (if0 (- n 1) 1 
+(+ (fibonacci (- n 1))(fibonacci (- n 2)))))))      ;<fermeture> : Int -> Int
+(def r10 (fibonacci 7))                             ; ↝ 13 : Int
+(def testr10 (if0 (- r10    13) 1 0))               ; ↝ 1 : Int
+
+
+
 ;; Vérifications de types
 (def test10a (: 20 Int))                    ; ↝ 20 : Int
 (def test10b (: (if0 0) (Int Int -> Int)))  ; ↝ <fonction> : Int -> Int -> Int
