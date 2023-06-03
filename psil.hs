@@ -453,7 +453,7 @@ process_decl ((tenv, venv), Nothing, res) (Ldef x e) =
 process_decl ((tenv, venv), Just (_,t) , res) (Ldef x e) =
     -- Le programmeur a *fourni* d'annotation de type pour `x`.
     let
-      -- `e` doit être évalué dans l'environement où il existe déjà `x` et 
+      -- `e` doit être évalué dans l'environement auquel il existe déjà `x` et 
       -- sa valeur. Cela est indispensable pour les fonctions récursives.
       val = eval venv' e 
       venv' = minsert venv x val
