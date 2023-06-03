@@ -1,9 +1,12 @@
+-- TP-1  --- Implantation d'une sorte de Lisp          -*- coding: utf-8 -*-
+-- Auteurs: Cintia Dalila Soares - C2791
+--          Carl Thibault - 0985781
+-- 3 juin 2023
+---------------------------------------------------------------------------
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use isNothing" #-}
 {-# HLINT ignore "Use putStr" #-}
 {-# HLINT ignore "Use concatMap" #-}
-
--- TP-1  --- Implantation d'une sorte de Lisp          -*- coding: utf-8 -*-
 {-# OPTIONS_GHC -Wall #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use camelCase" #-}
