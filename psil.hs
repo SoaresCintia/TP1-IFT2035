@@ -358,7 +358,7 @@ synth tenv (Lhastype e t) =
 synth tenv (Lapp e1 e2) = 
   -- "synthétise" le type `(t1 -> t2)` de `e1`
   -- vérifie que `e2` est de type `t1`
-  -- reenvoie `t2`
+  -- renvoie `t2`
     case synth tenv e1 of
       Larw t1 t2 -> case check tenv e2 t1 of
                       Nothing -> t2
@@ -369,7 +369,7 @@ synth tenv (Llet x e1 e2) =
   -- "synthétise" le type `t1` de `e1`
   -- "synthétise" le type `t2` de `e2` dans l'environement auquel on a 
   -- ajouté `(x,t1)`
-  -- reenvoie `t2`
+  -- renvoie `t2`
   let
     t1 = synth tenv e1 
     t2 = synth ((x,t1):tenv) e2 
@@ -451,9 +451,9 @@ process_decl ((tenv, venv), Nothing, res) (Ldef x e) =
 -- ¡¡COMPLÉTER ICI!!
 
 process_decl ((tenv, venv), Just (_,t) , res) (Ldef x e) =
-    -- Le programmeur a *fourni* d'annotation de type pour `x`.
+    -- Le programmeur a *fourni* l'annotation de type pour `x`.
     let
-      -- `e` doit être évalué dans l'environement auquel il existe déjà `x` et 
+      -- `e` doit être évalué dans l'environement où il existe déjà `x` et 
       -- sa valeur. Cela est indispensable pour les fonctions récursives.
       val = eval venv' e 
       venv' = minsert venv x val
@@ -493,7 +493,7 @@ run filename
 sexpOf :: String -> Sexp
 sexpOf = read
 
--- lexOf : transforme la commende en en Lexpression
+-- lexpOf : transforme la commende en en Lexpression
 lexpOf :: String -> Lexp
 lexpOf = s2l . sexpOf
 
