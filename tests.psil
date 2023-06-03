@@ -46,24 +46,39 @@
 (def r8 (fun x (fun y (+ x y))))       ; ↝ <fermeture> : Int -> Int -> Int
 (def r8pl (let ((x 3)) (r8 x 4)))      ; ↝ 7 : Lint
 
-;; Test porté statique 
-; TODO
-; ; essayer de faire une exemple pour tester la porté statique
-; comme l'exemple zoom des notes des cours ?
+;(dec r9 Int)
+;def r9 (let (f ( : (fun x (- x 2)) (Int -> Int) )) (f 0)))
+
+
+
 
 ;; Récursion
 (dec fact (Int -> Int))
 (def fact (fun n (if0 n 1 (* n (fact (- n 1)))))) ; <fermture> : Int -> Int
-(def r9 (fact 5))                                 ; ↝ 120 : Int
-(def testr9 (if0 (- r9 120) 1 0))                 ; ↝ 1 : Int
+(def r10 (fact 5))                                 ; ↝ 120 : Int
+(def testr10 (if0 (- r10 120) 1 0))                 ; ↝ 1 : Int
 
 (dec fibonacci (Int -> Int))
 (def fibonacci (fun n (if0 n 0 (if0 (- n 1) 1 
 (+ (fibonacci (- n 1))(fibonacci (- n 2)))))))      ;<fermeture> : Int -> Int
-(def r10 (fibonacci 7))                             ; ↝ 13 : Int
-(def testr10 (if0 (- r10    13) 1 0))               ; ↝ 1 : Int
+(def r11 (fibonacci 7))                             ; ↝ 13 : Int
+(def testr11 (if0 (- r11    13) 1 0))               ; ↝ 1 : Int
 
+;; Test porté statique 
+; TODO
+; ; essayer de faire une exemple pour tester la porté statique
+; comme l'exemple zoom des notes des cours ?
+;zoom = 2
+;  f x = x * zoom
+;  g n = (let zoom = 10 in f n) + f (n + 1)
 
+(def zoom 2)                                    ;2 : Lint
+(dec f (Int -> Int))                            
+(def f (fun x (* x zoom)) )                     ;<fermeture> : Larw Lint Lint
+(dec g (Int -> Int))
+(def g (fun n (+ ( let ((zoom 10)) (f n))(f ((+ n 1))))))                        ;<fermeture> : Larw Lint Lint
+(def r12 (g 2))                                 ;10 : Lint
+; g (2) ↝ f (2) + f (3) ↝ 4 + 6 ↝ 10
 
 ;; Vérifications de types
 (def test10a (: 20 Int))                    ; ↝ 20 : Int
