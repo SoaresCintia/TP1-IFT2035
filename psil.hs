@@ -1,7 +1,7 @@
 -- TP-1  --- Implantation d'une sorte de Lisp          -*- coding: utf-8 -*-
+-- 3 juin 2023
 -- Auteurs: Cintia Dalila Soares - C2791
 --          Carl Thibault - 0985781
--- 3 juin 2023
 ---------------------------------------------------------------------------
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use isNothing" #-}
