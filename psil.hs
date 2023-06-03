@@ -367,7 +367,7 @@ synth tenv (Lapp e1 e2) =
 
 synth tenv (Llet x e1 e2) =
   -- "synthétise" le type `t1` de `e1`
-  -- "synthétise" le type `t2` de `e2` dans l'environement auquel on a 
+  -- "synthétise" le type `t2` de `e2` dans l'environement où on a 
   -- ajouté `(x,t1)`
   -- renvoie `t2`
   let
